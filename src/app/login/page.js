@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import Link from "next/link";
 import { handleLogin } from "../api/auth/login/route";
 import "./style.css";
@@ -8,15 +10,30 @@ import "./style.css";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      router.push("/dashboard");
+    }
+  }, [router]);
 
   const handleSubmit = async (event) => {
+    event.preventDefault();
+
     const result = await handleLogin({
       email,
       password,
     });
 
     if (result.success) {
-      alert(result.message);
+      Cookies.set("token", result.token, { path: "/", httpOnly: false });
+      Cookies.set("refreshToken", result.refreshToken, {
+        path: "/",
+        httpOnly: false,
+      });
+      router.push("/dashboard");
     } else {
       alert(result.message);
     }
@@ -50,7 +67,7 @@ export default function Login() {
         <div className="container">
           <div className="login">
             <h1>Login Form</h1>
-            <form onSubmit={handleSubmit} action="">
+            <form onSubmit={handleSubmit}>
               <div className="input-box">
                 <input
                   type="email"

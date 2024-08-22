@@ -20,8 +20,6 @@ export default function Login() {
   }, [router]);
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
-
     const result = await handleLogin({
       email,
       password,

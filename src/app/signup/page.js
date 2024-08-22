@@ -62,8 +62,8 @@ export default function SignUp() {
             </div>
             <button type="submit">REGISTER</button>
             <div className="links">
-                <Link href="/login">login here</Link>
-              </div>
+              <Link href="/login">login here</Link>
+            </div>
           </form>
         </div>
       </div>

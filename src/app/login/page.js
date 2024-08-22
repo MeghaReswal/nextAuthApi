@@ -1,33 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import Link from "next/link";
-// import { useRouter } from "next/router";
+import { handleLogin } from "../api/auth/login/route";
 import "./style.css";
 
 export default function Login() {
-  // const router = useRouter()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    const result = await handleLogin({
+      email,
+      password,
+    });
 
-    try {
-      const response = await axios.post("/api/auth/login", {
-        email,
-        password,
-      });
-
-      console.log("ResponseFe", response);
-      alert(response.data.message);
-    } catch (error) {
-      console.error(
-        "Error:",
-        error.response ? error.response.data : error.message
-      );
-      alert(error.response ? error.response.data.message : "An error occurred");
+    if (result.success) {
+      alert(result.message);
+    } else {
+      alert(result.message);
     }
   };
 
@@ -39,9 +30,8 @@ export default function Login() {
             <Link href="/">
               <button
                 type="button"
-                class="btn btn-secondary"
+                className="btn btn-secondary"
                 style={{ color: "white" }}
-                // onClick={() => router.push("/login")}
               >
                 Login
               </button>
@@ -49,7 +39,7 @@ export default function Login() {
             <Link href="/signup">
               <button
                 type="button"
-                class="btn btn-secondary"
+                className="btn btn-secondary"
                 style={{ color: "white" }}
               >
                 SignUp
@@ -77,11 +67,11 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <i class="fas fa-lock"></i>
+                <i className="fas fa-lock"></i>
               </div>
               <div className="rembar">
                 <input id="rembar" type="checkbox" />
-                <label for="rembar">remember me</label>
+                <label htmlFor="rembar">remember me</label>
               </div>
               <button type="submit">LOGIN</button>
               <div className="links">

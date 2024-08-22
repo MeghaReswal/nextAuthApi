@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import { handleSignup } from "../api/auth/signup/route";
 import Link from "next/link";
 import "./style.css";
 
@@ -11,23 +11,16 @@ export default function SignUp() {
   const [fullname, setFullname] = useState("");
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    const result = await handleSignup({
+      email,
+      password,
+      fullname,
+    });
 
-    try {
-      const response = await axios.post("/api/auth/signup", {
-        email,
-        password,
-        fullname,
-      });
-
-      console.log("ResponseFe", response);
-      alert(response.data.message);
-    } catch (error) {
-      console.error(
-        "Error:",
-        error.response ? error.response.data : error.message
-      );
-      alert(error.response ? error.response.data.message : "An error occurred");
+    if (result.success) {
+      alert(result.message);
+    } else {
+      alert(result.message);
     }
   };
 
@@ -36,23 +29,24 @@ export default function SignUp() {
       <div className="container">
         <div className="login">
           <h1>Sign Up</h1>
-
-          <form onSubmit={handleSubmit} action="">
+          <form onSubmit={handleSubmit}>
             <div className="input-box">
               <input
                 type="text"
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
-                placeholder="fullname"
+                placeholder="Full Name"
+                required
               />
-              <i class="fas fa-lock"></i>
+              <i className="fas fa-user"></i>
             </div>
             <div className="input-box">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="email"
+                placeholder="Email"
+                required
               />
               <i className="fa fa-envelope"></i>
             </div>
@@ -64,12 +58,12 @@ export default function SignUp() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <i class="fas fa-lock"></i>
+              <i className="fas fa-lock"></i>
             </div>
             <button type="submit">REGISTER</button>
             <div className="links">
-              <Link href="/login">Go to Home</Link>
-            </div>
+                <Link href="/login">login here</Link>
+              </div>
           </form>
         </div>
       </div>

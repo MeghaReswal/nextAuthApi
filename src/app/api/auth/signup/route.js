@@ -1,37 +1,27 @@
+"use server";
+
 import bcrypt from "bcryptjs";
-import { NextResponse } from "next/server";
 import User from "../../../../../modal/user";
 import dbConnection from "../../../../../libs/mongo";
-import {validateEmail} from "../../../../../libs/validateCredential"
+import { validateEmail } from "../../../../../libs/validateCredential";
 
-export async function POST(req) {
+
+export async function handleSignup({ email, password, fullname }) {
   try {
-    await dbConnection(); 
-
-    const {email, password, fullname} = await req.json();
-    console.log("Request32", email, password, fullname);
+    await dbConnection();
 
     if (!email || !password || !fullname) {
-      return NextResponse.json(
-        { success: false, message: "Please fill in all fields" },
-        { status: 400 }
-      );
+      return { success: false, message: "Please fill in all fields" };
     }
 
     const emailError = validateEmail(email);
     if (emailError) {
-      return NextResponse.json(
-        { success: false, message: emailError },
-        { status: 400 }
-      );
+      return { success: false, message: emailError };
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return NextResponse.json(
-        { success: false, message: "User already exists. Please log in." },
-        { status: 400 }
-      );
+      return { success: false, message: "User already exists. Please log in." };
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -44,15 +34,9 @@ export async function POST(req) {
 
     await newUser.save();
 
-    return NextResponse.json(
-      { success: true, message: "User registered successfully!" },
-      { status: 201 }
-    );
+    return { success: true, message: "User registered successfully!" };
   } catch (error) {
     console.error("Error during registration:", error);
-    return NextResponse.json(
-      { success: false, message: "Something went wrong" },
-      { status: 500 }
-    );
+    return { success: false, message: "Something went wrong" };
   }
 }

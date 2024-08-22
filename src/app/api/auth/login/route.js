@@ -1,25 +1,21 @@
+"use server";
+
 import User from "../../../../../modal/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { NextResponse } from "next/server";
 import dbConnection from "../../../../../libs/mongo";
 
 const JWT_SECRET = "secretvalue";
-const REFRESH_TOKEN_SECRET = "secretrefresh"; 
+const REFRESH_TOKEN_SECRET = "secretrefresh";
 
-export async function POST(req) {
+export async function handleLogin({ email, password }) {
   try {
     await dbConnection();
 
-    const { email, password } = await req.json();
-
-    // Find and authenticate user
+    // check the email and password is correct or not
     const user = await User.findOne({ email });
     if (!user || !bcrypt.compareSync(password, user.password)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid email or password" },
-        { status: 401 }
-      );
+      return { success: false, message: "Invalid email or password" };
     }
 
     // Generate tokens
@@ -28,27 +24,22 @@ export async function POST(req) {
       expiresIn: "7d",
     });
 
-    // Set refresh token in an HTTP-only cookie
-    const res = NextResponse.json({
+    // Return the token and user data
+    return {
       success: true,
       token,
-      message : "successfully logged in",
+      message: "Successfully logged in",
       id: user.id,
       fullname: user.fullname,
       email: user.email,
-    });
-    res.cookies.set("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-    });
-
-    return res;
+      refreshToken, 
+    };
   } catch (err) {
     console.error("Error during login:", err);
-    return NextResponse.json(
-      { success: false, message: "Something went wrong", error: err.message },
-      { status: 500 }
-    );
+    return {
+      success: false,
+      message: "Something went wrong",
+      error: err.message,
+    };
   }
 }

@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
 
-// Define the User schema
 const UserSchema = new mongoose.Schema(
   {
     email: {
@@ -25,7 +24,6 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-// Check if the model is already compiled
 const User = mongoose.models.User || mongoose.model("User", UserSchema);
 
 export default User;
